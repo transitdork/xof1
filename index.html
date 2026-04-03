@@ -204,6 +204,21 @@ nav.tabs{height:calc(var(--tab-h) + env(safe-area-inset-bottom,0px));background:
 .trk-drs-bar { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
 .trk-drs-zone { background:#27F4D220; border:1px solid #27F4D250; border-radius:4px; padding:3px 8px; font-size:11px; color:#27F4D2; font-family:"Share Tech Mono",monospace; }
 .trk-img-placeholder { width:100%; height:160px; background:var(--surface); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; margin-bottom:12px; }
+
+/* ── NEWS TAB ───────────────────────────────────────────────────────────────── */
+.news-toggle { display:flex; background:var(--surface); border-radius:6px; padding:3px; gap:3px; margin-bottom:12px; }
+.news-btn { flex:1; padding:9px 0; text-align:center; font-family:"Barlow Condensed",sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:none; border-radius:4px; cursor:pointer; color:var(--muted); background:none; transition:all .18s; -webkit-tap-highlight-color:transparent; }
+.news-btn.active { background:var(--red); color:#fff; }
+.news-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:13px 14px; margin-bottom:9px; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:border-color .15s; }
+.news-card:active { border-color:var(--red); }
+.news-meta { display:flex; align-items:center; gap:7px; margin-bottom:7px; }
+.news-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.news-src { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); }
+.news-time { font-size:11px; color:var(--muted); margin-left:auto; font-family:"Share Tech Mono",monospace; }
+.news-headline { font-size:16px; font-weight:700; line-height:1.3; margin-bottom:5px; }
+.news-summary { font-size:12px; color:var(--muted); line-height:1.5; }
+.news-empty { text-align:center; padding:48px 24px; color:var(--muted); font-size:14px; }
+.news-load-more { width:100%; padding:12px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--muted); font-family:"Barlow Condensed",sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; cursor:pointer; margin-top:4px; text-transform:uppercase; }
 </style>
 </head>
 <body>
@@ -226,6 +241,13 @@ nav.tabs{height:calc(var(--tab-h) + env(safe-area-inset-bottom,0px));background:
   <div id="pane-schedule" class="pane">
     <div class="section-hd" id="scheduleHd">Season Calendar</div>
     <div id="scheduleContent"><div class="loader"><div class="spinner"></div>Loading schedule…</div></div>
+  </div>
+  <div id="pane-news" class="pane">
+    <div class="news-toggle">
+      <button class="news-btn active" id="btnNews" onclick="setNewsTab('news')">📰 News</button>
+      <button class="news-btn" id="btnGossip" onclick="setNewsTab('gossip')">💬 Gossip</button>
+    </div>
+    <div id="newsContent"><div class="loader"><div class="spinner"></div>Loading stories…</div></div>
   </div>
   <div id="pane-tracks" class="pane">
     <div class="section-hd" id="tracksHd">2026 Circuits</div>
@@ -258,6 +280,10 @@ nav.tabs{height:calc(var(--tab-h) + env(safe-area-inset-bottom,0px));background:
   <button class="tab" id="tab-history" onclick="switchTab('history')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/><path d="M3.6 9A9 9 0 0 1 12 3"/><polyline points="3 3 3.6 9 9.6 8.4"/></svg>
     History
+  </button>
+  <button class="tab" id="tab-news" onclick="switchTab('news')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>
+    News
   </button>
   <button class="tab" id="tab-tracks" onclick="switchTab('tracks')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 C3 17 5 7 9 7 C13 7 11 17 15 17 C19 17 21 7 21 7"/><circle cx="6" cy="17" r="1.5" fill="currentColor"/><circle cx="18" cy="7" r="1.5" fill="currentColor"/></svg>
@@ -368,6 +394,21 @@ const CIRCUIT_LAYOUT_WIKI = {
   losail:'Lusail_International_Circuit',
 };
 
+
+// ── News & Gossip RSS feeds ───────────────────────────────────────────────────
+const NEWS_FEEDS = {
+  news: [
+    { name:'BBC Sport',    color:'#bb1919', url:'https://feeds.bbci.co.uk/sport/formula1/rss.xml' },
+    { name:'Autosport',    color:'#e4002b', url:'https://www.autosport.com/rss/feed/f1' },
+    { name:'RaceFans',     color:'#3671C6', url:'https://www.racefans.net/feed/' },
+    { name:'Motorsport',   color:'#FF8000', url:'https://www.motorsport.com/rss/f1/news/' },
+  ],
+  gossip: [
+    { name:'The Race',     color:'#f5a623', url:'https://the-race.com/feed/' },
+    { name:'Planet F1',    color:'#E10600', url:'https://www.planetf1.com/feed/' },
+  ],
+};
+
 const WX_ICON = {
   0:'☀️',1:'🌤️',2:'⛅',3:'☁️',
   45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',
@@ -390,6 +431,7 @@ const S = {
   schedule:null,lastRace:null,
   historyRound:null,historyResults:null,
   trackCircuitId:null,
+  newsTab:'news',newsItems:null,newsPage:0,
   refreshTimer:null,isLive:false,
 };
 
@@ -507,6 +549,7 @@ async function refreshCurrentTab() {
   else if (S.activeTab === 'schedule') { S.schedule=null; await loadSchedule(); }
   else if (S.activeTab === 'history') { S.historyResults=null; await loadHistory(); }
   else if (S.activeTab === 'tracks') { S.trackCircuitId=null; await loadTracks(); }
+  else if (S.activeTab === 'news') { S.newsItems=null; await loadNews(); }
 }
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
@@ -520,6 +563,7 @@ function switchTab(tab) {
   if (tab==='schedule'&&!S.schedule) loadSchedule();
   if (tab==='history') loadHistory();
   if (tab==='tracks') loadTracks();
+  if (tab==='news') loadNews();
 }
 
 function setStandingsTab(sub) {
@@ -1208,6 +1252,206 @@ function getCountryFlag(country) {
     'Portugal':'🇵🇹',
   };
   return map[country] || '🏁';
+}
+
+
+// ── NEWS TAB ──────────────────────────────────────────────────────────────────
+
+// getRSS: fetches raw XML text via proxy (RSS doesn't support JSONP)
+function getRSS(url, timeoutMs) {
+  timeoutMs = timeoutMs || 10000;
+  // allorigins /raw returns raw content; corsproxy returns raw content
+  var proxies = [
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    'https://corsproxy.io/?' + encodeURIComponent(url),
+  ];
+  var lastErr = null;
+  function attempt(i) {
+    if (i >= proxies.length) return Promise.reject(lastErr || new Error('RSS fetch failed'));
+    var tP = new Promise(function(_, rej) { setTimeout(function() { rej(new Error('Timeout')); }, timeoutMs); });
+    var fP = fetch(proxies[i]).then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    });
+    return Promise.race([fP, tP]).catch(function(e) { lastErr = e; return attempt(i + 1); });
+  }
+  return attempt(0);
+}
+
+// parseRSS: extracts items from RSS 2.0 or Atom XML text
+function parseRSS(xmlText, sourceName, sourceColor) {
+  try {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(xmlText, 'text/xml');
+    // RSS 2.0: <item>, Atom: <entry>
+    var items = Array.from(doc.querySelectorAll('item, entry'));
+    return items.slice(0, 12).map(function(item) {
+      var title = (item.querySelector('title') || {}).textContent || '';
+      // Atom link: <link href="..."/>, RSS: <link>text</link>
+      var linkEl = item.querySelector('link[href]');
+      var link = linkEl ? linkEl.getAttribute('href') : ((item.querySelector('link') || {}).textContent || '');
+      // Description: <description>, <summary>, or <content>
+      var descEl = item.querySelector('description') || item.querySelector('summary') || item.querySelector('content');
+      var rawDesc = descEl ? descEl.textContent : '';
+      // Strip HTML tags from description
+      var tmp = document.createElement('div');
+      tmp.innerHTML = rawDesc;
+      var desc = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+      // Date
+      var dateStr = (item.querySelector('pubDate') || item.querySelector('published') ||
+                     item.querySelector('updated') || {}).textContent || '';
+      var date = dateStr ? new Date(dateStr) : new Date(0);
+      return {
+        title: title.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#039;/g,"'").replace(/&quot;/g,'"').trim(),
+        link: link.trim(),
+        desc: desc,
+        ts: isNaN(date.getTime()) ? 0 : date.getTime(),
+        source: sourceName,
+        color: sourceColor,
+      };
+    }).filter(function(i) { return i.title.length > 0; });
+  } catch(e) {
+    console.warn('[F1 News] XML parse error:', e.message);
+    return [];
+  }
+}
+
+function setNewsTab(tab) {
+  S.newsTab = tab;
+  S.newsItems = null;
+  S.newsPage = 0;
+  document.getElementById('btnNews').classList.toggle('active', tab === 'news');
+  document.getElementById('btnGossip').classList.toggle('active', tab === 'gossip');
+  document.getElementById('newsContent').innerHTML = '<div class="loader"><div class="spinner"></div>Loading stories…</div>';
+  loadNews();
+}
+
+async function loadNews() {
+  var isGossip = S.newsTab === 'gossip';
+  var cacheKey = isGossip ? 'news_gossip' : 'news_main';
+
+  // Show cached data immediately while refreshing
+  var cached = cacheGet(cacheKey, 15 * 60 * 1000); // 15 min cache
+  if (cached && cached.length) {
+    S.newsItems = cached.map(function(i) { return Object.assign({}, i, { date: new Date(i.ts) }); });
+    renderNews();
+    return;
+  }
+
+  document.getElementById('newsContent').innerHTML = '<div class="loader"><div class="spinner"></div>Fetching latest stories…</div>';
+
+  var feeds = isGossip ? NEWS_FEEDS.gossip : NEWS_FEEDS.news;
+  var allItems = [];
+
+  // Fetch all feeds in parallel, gracefully ignore failures
+  var results = await Promise.allSettled(feeds.map(function(feed) {
+    return getRSS(feed.url, 10000).then(function(xml) {
+      var items = parseRSS(xml, feed.name, feed.color);
+      allItems = allItems.concat(items);
+    });
+  }));
+
+  results.forEach(function(r, i) {
+    if (r.status === 'rejected') console.warn('[F1 News] ' + feeds[i].name + ' failed:', r.reason.message);
+  });
+
+  // Sort newest first
+  allItems.sort(function(a, b) { return b.ts - a.ts; });
+  // Deduplicate by title similarity
+  var seen = new Set();
+  allItems = allItems.filter(function(item) {
+    var key = item.title.toLowerCase().slice(0, 40);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  S.newsItems = allItems;
+  S.newsPage = 0;
+  cacheSet(cacheKey, allItems); // store raw (ts is a number, serialises fine)
+
+  renderNews();
+}
+
+var NEWS_PAGE_SIZE = 20;
+
+function renderNews() {
+  var items = S.newsItems || [];
+  var content = document.getElementById('newsContent');
+
+  if (!items.length) {
+    content.innerHTML = '<div class="news-empty">No stories loaded yet.<br>Pull down to refresh.</div>';
+    return;
+  }
+
+  var page = S.newsPage || 0;
+  var pageItems = items.slice(0, (page + 1) * NEWS_PAGE_SIZE);
+  var hasMore = pageItems.length < items.length;
+
+  var frag = document.createDocumentFragment();
+
+  pageItems.forEach(function(item) {
+    var card = document.createElement('div');
+    card.className = 'news-card';
+
+    var timeAgo = fmtTimeAgo(item.ts);
+
+    var meta = document.createElement('div');
+    meta.className = 'news-meta';
+    meta.innerHTML =
+      '<div class="news-dot" style="background:' + item.color + '"></div>' +
+      '<span class="news-src">' + item.source + '</span>' +
+      '<span class="news-time">' + timeAgo + '</span>';
+
+    var headline = document.createElement('div');
+    headline.className = 'news-headline';
+    headline.textContent = item.title;
+
+    card.appendChild(meta);
+    card.appendChild(headline);
+
+    if (item.desc) {
+      var summary = document.createElement('div');
+      summary.className = 'news-summary';
+      summary.textContent = item.desc + (item.desc.length >= 160 ? '…' : '');
+      card.appendChild(summary);
+    }
+
+    if (item.link) {
+      (function(url) {
+        card.addEventListener('click', function() { window.open(url, '_blank'); });
+      })(item.link);
+    }
+
+    frag.appendChild(card);
+  });
+
+  if (hasMore) {
+    var more = document.createElement('button');
+    more.className = 'news-load-more';
+    more.textContent = 'Load more stories';
+    more.addEventListener('click', function() {
+      S.newsPage = (S.newsPage || 0) + 1;
+      renderNews();
+    });
+    frag.appendChild(more);
+  }
+
+  content.innerHTML = '';
+  content.appendChild(frag);
+}
+
+function fmtTimeAgo(ts) {
+  if (!ts) return '';
+  var diff = Date.now() - ts;
+  var mins = Math.floor(diff / 60000);
+  if (mins < 2) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  var hours = Math.floor(diff / 3600000);
+  if (hours < 24) return hours + 'h ago';
+  var days = Math.floor(diff / 86400000);
+  if (days < 7) return days + 'd ago';
+  return fmtDate(new Date(ts).toISOString().slice(0, 10));
 }
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
