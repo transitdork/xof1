@@ -417,32 +417,6 @@ const CIRCUIT_FACTS = {
   losail:      ["Qatar hosted its first F1 race in 2021 as an emergency replacement","The MotoGP circuit was adapted for F1 with minimal changes","The long high-speed corners put extreme loads on tyres","Was awarded a long-term F1 contract from 2023"],
 };
 
-const CIRCUIT_WINNERS = {
-  bahrain:     [{year:2024,driver:'M. Verstappen',team:'Red Bull'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'C. Leclerc',team:'Ferrari'}],
-  jeddah:      [{year:2024,driver:'M. Verstappen',team:'Red Bull'},{year:2023,driver:'S. Perez',team:'Red Bull'},{year:2022,driver:'C. Leclerc',team:'Ferrari'}],
-  albert_park: [{year:2024,driver:'C. Sainz',team:'Ferrari'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'C. Leclerc',team:'Ferrari'}],
-  suzuka:      [{year:2024,driver:'M. Verstappen',team:'Red Bull'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  shanghai:    [{year:2024,driver:'M. Verstappen',team:'Red Bull'},{year:2023,driver:'N/A (no race)',team:''},{year:2019,driver:'L. Hamilton',team:'Mercedes'}],
-  miami:       [{year:2024,driver:'L. Norris',team:'McLaren'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  imola:       [{year:2024,driver:'M. Verstappen',team:'Red Bull'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  monaco:      [{year:2024,driver:'C. Leclerc',team:'Ferrari'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'S. Perez',team:'Red Bull'}],
-  villeneuve:  [{year:2024,driver:'G. Russell',team:'Mercedes'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  catalunya:   [{year:2024,driver:'M. Verstappen',team:'Red Bull'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  silverstone: [{year:2024,driver:'L. Hamilton',team:'Mercedes'},{year:2023,driver:'L. Norris',team:'McLaren'},{year:2022,driver:'C. Sainz',team:'Ferrari'}],
-  hungaroring: [{year:2024,driver:'O. Piastri',team:'McLaren'},{year:2023,driver:'L. Hamilton',team:'Mercedes'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  spa:         [{year:2024,driver:'L. Hamilton',team:'Mercedes'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'C. Verstappen',team:'Red Bull'}],
-  zandvoort:   [{year:2024,driver:'L. Norris',team:'McLaren'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  monza:       [{year:2024,driver:'C. Leclerc',team:'Ferrari'},{year:2023,driver:'C. Sainz',team:'Ferrari'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  baku:        [{year:2024,driver:'O. Piastri',team:'McLaren'},{year:2023,driver:'S. Perez',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  marina_bay:  [{year:2024,driver:'L. Norris',team:'McLaren'},{year:2023,driver:'C. Sainz',team:'Ferrari'},{year:2022,driver:'S. Perez',team:'Red Bull'}],
-  americas:    [{year:2024,driver:'C. Leclerc',team:'Ferrari'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  rodriguez:   [{year:2024,driver:'C. Sainz',team:'Ferrari'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  interlagos:  [{year:2024,driver:'M. Verstappen',team:'Red Bull'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'G. Russell',team:'Mercedes'}],
-  las_vegas:   [{year:2024,driver:'C. Leclerc',team:'Ferrari'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'N/A (inaugural)',team:''}],
-  yas_marina:  [{year:2024,driver:'L. Norris',team:'McLaren'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2022,driver:'M. Verstappen',team:'Red Bull'}],
-  losail:      [{year:2024,driver:'M. Verstappen',team:'Red Bull'},{year:2023,driver:'M. Verstappen',team:'Red Bull'},{year:2021,driver:'L. Hamilton',team:'Mercedes'}],
-};
-
 // ── News & Gossip RSS feeds ───────────────────────────────────────────────────
 const NEWS_FEEDS = {
   news: [
@@ -1111,7 +1085,6 @@ async function showTrackDetail(race) {
   const circuitId = circuit.circuitId || '';
   const stats    = CIRCUIT_STATS[circuitId] || {};
   const facts    = CIRCUIT_FACTS[circuitId] || [];
-  const winners  = CIRCUIT_WINNERS[circuitId] || [];
   const flag     = getCountryFlag(loc.country || '');
 
   schedHd.textContent = circuit.circuitName || race.raceName;
@@ -1133,26 +1106,10 @@ async function showTrackDetail(race) {
       '</div>' +
     '</div>';
 
-  // Recent winners
-  let winnersHtml = '';
-  if (winners.length) {
-    const wRows = winners.map(function(w) {
-      const col = w.team ? teamColor(w.team.toLowerCase().replace(' ', '_')) : '#888';
-      return '<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border)">' +
-        '<div style="font-family:Share Tech Mono,monospace;font-size:13px;color:var(--muted);width:36px">' + w.year + '</div>' +
-        '<div style="width:3px;height:26px;background:' + col + ';border-radius:2px;flex-shrink:0"></div>' +
-        '<div style="flex:1"><div style="font-size:15px;font-weight:700">' + w.driver + '</div>' +
-          (w.team ? '<div style="font-size:11px;color:var(--muted)">' + w.team + '</div>' : '') +
-        '</div>' +
-        '<div style="font-size:20px">' + (w.year === winners[0].year ? '🥇' : '🏆') + '</div>' +
-      '</div>';
-    }).join('');
-    winnersHtml =
-      '<div class="section-hd" style="margin-top:4px">Recent Winners</div>' +
-      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:4px">' +
-        wRows +
-      '</div>';
-  }
+    // Recent winners — placeholder, populated async below
+  const winnersHtml =
+    '<div class="section-hd" style="margin-top:4px">Recent Winners</div>' +
+    '<div id="trk-winners-slot" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:4px;color:var(--muted);font-size:13px">Loading recent winners…</div>';
 
   // Fun facts
   let factsHtml = '';
@@ -1190,6 +1147,60 @@ async function showTrackDetail(race) {
     factsHtml;
 
   document.getElementById('scdBackBtn').addEventListener('click', backToSchedule);
+
+  // Fetch recent winners (last 3 years) dynamically from Jolpica ─────────────
+  (async function() {
+    const slot = document.getElementById('trk-winners-slot');
+    if (!slot || !circuitId) return;
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const yearsToCheck = [currentYear, currentYear - 1, currentYear - 2];
+    const winners = [];
+    for (const yr of yearsToCheck) {
+      try {
+        const cacheKey = 'winner_' + circuitId + '_' + yr;
+        let result = cacheGet(cacheKey, 86400000 * 30);
+        if (!result) {
+          const data = await jolpicaGet(JOLPICA + '/' + yr + '/circuits/' + circuitId + '/results.json');
+          const races = data && data.MRData && data.MRData.RaceTable && data.MRData.RaceTable.Races;
+          if (races && races.length && races[0].Results && races[0].Results.length) {
+            const r = races[0].Results[0];
+            result = {
+              year: yr,
+              driver: r.Driver.givenName[0] + '. ' + r.Driver.familyName,
+              team: r.Constructor ? r.Constructor.name : '',
+              constructorId: r.Constructor ? r.Constructor.constructorId : ''
+            };
+            cacheSet(cacheKey, result);
+          }
+        }
+        if (result) winners.push(result);
+      } catch(e) {
+        console.warn('[F1] Winner fetch failed for ' + circuitId + ' ' + yr + ':', e.message);
+      }
+    }
+    if (!winners.length) {
+      if (slot) slot.textContent = 'No recent winner data available.';
+      return;
+    }
+    const rows = winners.map(function(w, i) {
+      const col = teamColor(w.constructorId || w.team.toLowerCase().replace(/ /g, '_'));
+      const medal = i === 0 ? '🥇' : '🏆';
+      return '<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border)">' +
+        '<div style="font-family:Share Tech Mono,monospace;font-size:13px;color:var(--muted);width:36px">' + w.year + '</div>' +
+        '<div style="width:3px;height:26px;background:' + col + ';border-radius:2px;flex-shrink:0"></div>' +
+        '<div style="flex:1">' +
+          '<div style="font-size:15px;font-weight:700">' + w.driver + '</div>' +
+          (w.team ? '<div style="font-size:11px;color:var(--muted)">' + w.team + '</div>' : '') +
+        '</div>' +
+        '<div style="font-size:20px">' + medal + '</div>' +
+      '</div>';
+    }).join('');
+    if (slot) {
+      slot.style.padding = '0';
+      slot.innerHTML = rows;
+    }
+  })();
 
   // Fetch track image (async, injected when ready)
   const wikiKey = CIRCUIT_LAYOUT_WIKI[circuitId];
