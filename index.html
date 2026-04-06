@@ -836,7 +836,9 @@ async function renderNoSession() {
   const hoursLeft=Math.floor((msLeft%864e5)/36e5);
   const countdownStr=msLeft<=0?'TODAY':daysLeft;
   const countdownLabel=msLeft<=0?'':'DAYS';
+  const minsLeft=Math.floor((msLeft%36e5)/60000);
   const hoursStr=msLeft>0?hoursLeft+'h':'';
+  const minsStr=msLeft>0?minsLeft+'m':'';
 
   const sessionDefs=[
     {k:'FirstPractice',l:'Practice 1'},{k:'SecondPractice',l:'Practice 2'},
@@ -890,7 +892,7 @@ async function renderNoSession() {
       '<div class="ns-round">ROUND '+nextRace.round+' · '+nextRace.season+'</div>'+
       '<div class="ns-racename">'+nextRace.raceName+'</div>'+
       '<div class="ns-circuit">'+circuitLine+'</div>'+
-      '<div class="ns-countdown">'+'<div style="display:flex;flex-direction:column;align-items:center;margin-right:16px"><div class="ns-days-num">'+countdownStr+'</div><div class="ns-days-lbl">'+countdownLabel+'</div></div>'+(hoursStr?'<div style="display:flex;flex-direction:column;align-items:center"><div class="ns-days-num" style="font-size:40px;color:var(--muted)">'+hoursStr+'</div><div class="ns-days-lbl">HRS</div></div>':'')+'</div>'+
+      '<div class="ns-countdown">'+'<div style="display:flex;flex-direction:column;align-items:center;margin-right:16px"><div class="ns-days-num">'+countdownStr+'</div><div class="ns-days-lbl">'+countdownLabel+'</div></div>'+(hoursStr?'<div style="display:flex;flex-direction:column;align-items:center"><div class="ns-days-num" style="font-size:40px;color:var(--muted)">'+hoursStr+'</div><div class="ns-days-lbl">HRS</div></div>':'')+(minsStr?'<div style="display:flex;flex-direction:column;align-items:center"><div class="ns-days-num" style="font-size:40px;color:var(--muted)">'+minsStr+'</div><div class="ns-days-lbl">MINS</div></div>':'')+'</div>'+
       '<div class="ns-racetime">Race: '+fmtLocalTime(nextRace.date,nextRace.time)+'</div>'+
     '</div>'+
     '<div id="ns-img-slot"></div>'+
